@@ -6,32 +6,34 @@
 /*   By: samartin <samartin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/04 18:24:38 by samartin          #+#    #+#             */
-/*   Updated: 2022/10/10 17:16:10 by samartin         ###   ########.fr       */
+/*   Updated: 2022/10/13 10:59:57 by samartin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
 
-static unsigned int	append_chnk(char *line, char *read_buff, unsigned int pos, \
-	unsigned int len)
+static char	*append_chnk(char *line, char *read_buff, int *buff_pos, \
+	int buff_len)
 {
-	unsigned int	line_len;
-	unsigned int	i;
+	int	line_len;
+	int	i;
 
 	i = 0;
 	line_len = gnl_len(line);
-	while (i < len && read_buff[pos + i] != '\n')
+	while ((*buff_pos + i) < (buff_len - 1) && read_buff[*buff_pos + i] != '\n')
 		i++;
 	line = (char *)gnl_mexpand(line, (line_len + i + 1));
-	line = gnl_strncat(line, &read_buff[pos], i);
-	return (pos + i);
+	gnl_strncat(line, &read_buff[*buff_pos], i + 1);
+	*buff_pos = *buff_pos + i + 1;
+	return (line);
 }
 
-static unsigned int	fill_buffer(int fd, char *read_buff)
+static int	fill_buffer(int fd, char *read_buff)
 {
 	int	buff_len;
 
 	buff_len = read(fd, read_buff, BUFFER_SIZE);
+	read_buff[buff_len] = '\0';
 	return (buff_len);
 }
 
@@ -55,9 +57,12 @@ char	*get_next_line(int fd)
 	}
 	while (buff_len > 0 && (!*line || line[gnl_len(line) - 1] != '\n'))
 	{
-		buff_pos = append_chnk(line, read_buff, buff_pos, buff_len);
+		line = append_chnk(line, read_buff, &buff_pos, buff_len);
 		if (buff_pos >= buff_len)
+		{
 			buff_len = fill_buffer(fd, read_buff);
+			buff_pos = 0;
+		}
 	}
 	if (buff_len == -1)
 		free(read_buff);
@@ -65,20 +70,4 @@ char	*get_next_line(int fd)
 		return (NULL);
 	else
 		return (line);
-}
-
-#include <fcntl.h>
-#include <stdio.h>
-
-int	main()
-{
-	int			txt_file;
-	char		*line;
-
-	txt_file = open("textfile.txt", O_RDONLY);
-	line = get_next_line(txt_file);
-	if (!line)
-		close(txt_file);
-	printf("%s", line);
-	return (0);
 }

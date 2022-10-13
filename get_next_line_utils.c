@@ -6,13 +6,16 @@
 /*   By: samartin <samartin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/04 18:24:47 by samartin          #+#    #+#             */
-/*   Updated: 2022/10/10 17:16:12 by samartin         ###   ########.fr       */
+/*   Updated: 2022/10/13 10:52:56 by samartin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
+#include "get_next_line.h"
 #include <stdlib.h>
 
-static void	*gnl_memcpy(void *dst, const void *src, unsigned int n)
+#include <stdio.h>
+
+static void	*gnl_memcpy(void *dst, const void *src, int n)
 {
 	void	*ret;
 
@@ -29,7 +32,7 @@ static void	*gnl_memcpy(void *dst, const void *src, unsigned int n)
 	return (ret);
 }
 
-void	*gnl_mexpand(void *ptr, unsigned int size)
+void	*gnl_mexpand(void *ptr, int size)
 {
 	void	*ret_ptr;
 
@@ -38,14 +41,14 @@ void	*gnl_mexpand(void *ptr, unsigned int size)
 	ret_ptr = malloc(size * sizeof(char));
 	if (!ret_ptr)
 		return (NULL);
-	gnl_memcpy (ret_ptr, ptr, size);
+	gnl_memcpy(ret_ptr, ptr, size);
 	free (ptr);
 	return (ret_ptr);
 }
 
-unsigned int	gnl_len(const char *str)
+int	gnl_len(const char *str)
 {
-	unsigned int	i;
+	int	i;
 
 	i = 0;
 	while (str[i])
@@ -53,10 +56,10 @@ unsigned int	gnl_len(const char *str)
 	return (i);
 }
 
-char	*gnl_strncat(char *dest, char *src, unsigned int nb)
+char	*gnl_strncat(char *dest, char *src, int nb)
 {
-	unsigned int	pos1;
-	unsigned int	pos2;
+	int	pos1;
+	int	pos2;
 
 	pos1 = 0;
 	pos2 = 0;
@@ -68,6 +71,6 @@ char	*gnl_strncat(char *dest, char *src, unsigned int nb)
 		pos1++;
 		pos2++;
 	}
-	dest[pos1] = 0;
+	dest[pos1] = '\0';
 	return (dest);
 }

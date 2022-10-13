@@ -6,7 +6,7 @@
 /*   By: samartin <samartin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/04 18:24:26 by samartin          #+#    #+#             */
-/*   Updated: 2022/10/11 09:28:28 by samartin         ###   ########.fr       */
+/*   Updated: 2022/10/13 10:52:02 by samartin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,9 +19,9 @@
 # include <unistd.h>
 # include <fcntl.h>
 
-char			*get_next_line(int fd);
-void			*gnl_mexpand(void *ptr, unsigned int size);
-unsigned int	gnl_len(const char *str);
-char			*gnl_strncat(char *dest, char *src, unsigned int nb);
+char	*get_next_line(int fd);
+void	*gnl_mexpand(void *ptr, int size);
+int		gnl_len(const char *str);
+char	*gnl_strncat(char *dest, char *src, int nb);
 
 #endif
