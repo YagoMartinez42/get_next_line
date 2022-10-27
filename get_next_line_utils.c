@@ -6,7 +6,7 @@
 /*   By: samartin <samartin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/04 18:24:47 by samartin          #+#    #+#             */
-/*   Updated: 2022/10/18 09:23:58 by samartin         ###   ########.fr       */
+/*   Updated: 2022/10/25 14:37:34 by samartin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,13 +34,14 @@ void	*gnl_mexpand(void *ptr, int size)
 {
 	void	*ret_ptr;
 
-	if (!ptr)
-		return (NULL);
 	ret_ptr = malloc(size * sizeof(char));
 	if (!ret_ptr)
 		return (NULL);
-	gnl_memcpy(ret_ptr, ptr, size);
-	free (ptr);
+	if (ptr)
+	{
+		ret_ptr = gnl_memcpy(ret_ptr, ptr, size);
+		free (ptr);
+	}
 	return (ret_ptr);
 }
 
@@ -61,9 +62,9 @@ char	*gnl_strncat(char *dest, char *src, int nb)
 
 	pos1 = 0;
 	pos2 = 0;
-	while (dest[pos1] != 0)
+	while (dest[pos1] != '\0')
 		pos1++;
-	while (src[pos2] != 0 && pos2 < nb)
+	while (src[pos2] != '\0' && pos2 < nb)
 	{
 		dest[pos1] = src[pos2];
 		pos1++;
