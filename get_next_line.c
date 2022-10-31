@@ -6,7 +6,7 @@
 /*   By: samartin <samartin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/26 17:13:19 by samartin          #+#    #+#             */
-/*   Updated: 2022/10/27 13:32:38 by samartin         ###   ########.fr       */
+/*   Updated: 2022/10/29 18:29:45 by samartin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +27,7 @@ static char	*append_chnk(char **line, char *buffer)
 		i++;
 	if (i == 0)
 		return (NULL);
-	*line = (char *)gnl_mexpand(*line, (line_len + i + 1));
+	*line = (char *)gnl_mexpand(*line, line_len + i + 1);
 	*line = gnl_strncat(*line, buffer, i);
 	buffer += i;
 	return (buffer);
@@ -44,17 +44,13 @@ static char	*fill_buffer(int fd, char *buffer)
 	return (buffer);
 }
 
-static char	*buffer_init(int fd, char *buf, char *line)
+static char	*buffer_init(int fd, char *buf)
 {
 	if (!buf)
 	{
-		buf = malloc(BUFFER_SIZE + 1 * (sizeof(char)));
+		buf = malloc((BUFFER_SIZE + 1) * (sizeof(char)));
 		if (!buf)
-		{
-			if (line)
-				free (line);
 			return (NULL);
-		}
 		buf = fill_buffer(fd, buf);
 		if (!buf || *buf == '\0')
 			return (NULL);
@@ -74,15 +70,15 @@ char	*get_next_line(int fd)
 	static char	*buf = NULL;
 
 	line = NULL;
-	buf = buffer_init(fd, buf, line);
+	buf = buffer_init(fd, buf);
 	if (!buf)
 		return (NULL);
-	while (!line || (line[gnl_len(line) - 1] != '\n'))
+	while (!line || (*(line + (gnl_len(line) - 1)) != '\n'))
 	{
 		buf = append_chnk(&line, buf);
 		if (*buf == '\0')
 		{
-			buf = fill_buffer(fd, buf - BUFFER_SIZE);
+			buf = fill_buffer(fd, (buf - BUFFER_SIZE));
 			if (!buf || *buf == '\0')
 				return (line);
 		}

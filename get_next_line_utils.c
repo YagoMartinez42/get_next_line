@@ -6,7 +6,7 @@
 /*   By: samartin <samartin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/04 18:24:47 by samartin          #+#    #+#             */
-/*   Updated: 2022/10/25 14:37:34 by samartin         ###   ########.fr       */
+/*   Updated: 2022/10/29 18:28:26 by samartin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,8 +33,15 @@ static void	*gnl_memcpy(void *dst, const void *src, int n)
 void	*gnl_mexpand(void *ptr, int size)
 {
 	void	*ret_ptr;
+	int		i;
 
 	ret_ptr = malloc(size * sizeof(char));
+	i = 0;
+	while (i < size)
+	{
+		((char *)ret_ptr)[i] = '\0';
+		i++;
+	}
 	if (!ret_ptr)
 		return (NULL);
 	if (ptr)
