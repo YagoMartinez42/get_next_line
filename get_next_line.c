@@ -6,7 +6,7 @@
 /*   By: samartin <samartin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/26 17:13:19 by samartin          #+#    #+#             */
-/*   Updated: 2022/10/31 15:13:04 by samartin         ###   ########.fr       */
+/*   Updated: 2022/11/03 11:23:05 by samartin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,19 +51,16 @@ static char	*fill_buffer(int fd, char *buffer)
 
 static char	*buffer_init(int fd, char *buf, char **buf_start)
 {
-	if (!buf)
+	if (!buf || *buf == '\0')
 	{
-		buf = malloc((BUFFER_SIZE + 1) * (sizeof(char)));
 		if (!buf)
-			return (NULL);
+		{
+			buf = malloc((BUFFER_SIZE + 1) * (sizeof(char)));
+			if (!buf)
+				return (NULL);
+			*buf_start = buf;
+		}
 		buf = fill_buffer(fd, buf);
-		if (!buf || *(buf) == '\0')
-			return (NULL);
-		*buf_start = buf;
-	}
-	else if (*buf == '\0')
-	{
-		buf = fill_buffer(fd, *buf_start);
 		if (!buf || *(buf) == '\0')
 			return (NULL);
 	}
@@ -83,6 +80,8 @@ char	*get_next_line(int fd)
 	while (!line || (*(line + (gnl_len(line) - 1)) != '\n'))
 	{
 		buf = append_chnk(&line, buf);
+		if (*(line + (gnl_len(line) - 1)) == '\n')
+			break ;
 		if (*buf == '\0')
 		{
 			buf = fill_buffer(fd, buf_start);
