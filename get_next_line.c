@@ -6,7 +6,7 @@
 /*   By: samartin <samartin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/26 17:13:19 by samartin          #+#    #+#             */
-/*   Updated: 2022/11/03 11:23:05 by samartin         ###   ########.fr       */
+/*   Updated: 2022/11/03 12:45:17 by samartin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,37 +35,33 @@ static char	*append_chnk(char **line, char *buffer)
 	return (buffer);
 }
 
-static char	*fill_buffer(int fd, char *buffer)
+static char	*fill_buffer(int fd, char *buf, char *buf_start)
 {
 	int	buff_len;
 
-	buff_len = read(fd, (buffer), BUFFER_SIZE);
-	if (buff_len < 1)
+	if (*buf == '\0')
 	{
-		free (buffer);
-		return (NULL);
+		buf = buf_start;
+		buff_len = read(fd, (buf), BUFFER_SIZE);
+		if (buff_len < 1)
+		{
+			free (buf);
+			return (NULL);
+		}
+		buf[buff_len] = '\0';
 	}
-	buffer[buff_len] = '\0';
-	return (buffer);
+	return (buf);
 }
-
+/*
 static char	*buffer_init(int fd, char *buf, char **buf_start)
 {
-	if (!buf || *buf == '\0')
-	{
-		if (!buf)
-		{
-			buf = malloc((BUFFER_SIZE + 1) * (sizeof(char)));
-			if (!buf)
-				return (NULL);
-			*buf_start = buf;
-		}
+
 		buf = fill_buffer(fd, buf);
 		if (!buf || *(buf) == '\0')
 			return (NULL);
 	}
 	return (buf);
-}
+}*/
 
 char	*get_next_line(int fd)
 {
@@ -73,21 +69,24 @@ char	*get_next_line(int fd)
 	static char	*buf = NULL;
 	static char	*buf_start = NULL;
 
-	line = NULL;
-	buf = buffer_init(fd, buf, &buf_start);
 	if (!buf)
-		return (NULL);
-	while (!line || (*(line + (gnl_len(line) - 1)) != '\n'))
 	{
-		buf = append_chnk(&line, buf);
-		if (*(line + (gnl_len(line) - 1)) == '\n')
+		buf = malloc((BUFFER_SIZE + 1) * (sizeof(char)));
+		if (!buf)
+			return (NULL);
+		*buf = '\0';
+		buf_start = buf;
+	}
+	line = NULL;
+	//buf = buffer_init(fd, buf, &buf_start);
+	//if (!buf)
+	//	return (NULL);
+	while (!line || (line[gnl_len(line) - 1] != '\n'))
+	{
+		buf = fill_buffer(fd, buf, buf_start);
+		if (!buf || *(buf) == '\0')
 			break ;
-		if (*buf == '\0')
-		{
-			buf = fill_buffer(fd, buf_start);
-			if (!buf || *(buf) == '\0')
-				break ;
-		}
+		buf = append_chnk(&line, buf);
 	}
 	return (line);
 }
