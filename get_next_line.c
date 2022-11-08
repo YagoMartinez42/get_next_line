@@ -6,7 +6,7 @@
 /*   By: samartin <samartin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/26 17:13:19 by samartin          #+#    #+#             */
-/*   Updated: 2022/11/06 17:53:00 by samartin         ###   ########.fr       */
+/*   Updated: 2022/11/08 16:09:10 by samartin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,6 @@ static char	*append_chnk(char **line, char *buf)
 {
 	int	i;
 	int	line_len;
-	int	new_len;
 
 	i = 0;
 	line_len = 0;
@@ -30,11 +29,7 @@ static char	*append_chnk(char **line, char *buf)
 		i++;
 	if (i == 0)
 		return (NULL);
-	new_len = line_len;
-	*line = (char *)realloc(*line, line_len + i + 1);
-	//while (new_len < (line_len + i))
-	//	new_len += 80;
-	//*line = (char *)gnl_mexpand(*line, new_len + 1);
+	*line = (char *)gnl_mexpand(*line, line_len + i + 1);
 	*line = gnl_strncat(*line, buf, i);
 	buf += i;
 	return (buf);
