@@ -1,16 +1,31 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   get_next_line.c                                    :+:      :+:    :+:   */
+/*   get_next_line_bonus.c                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: samartin <samartin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/10/26 17:13:19 by samartin          #+#    #+#             */
-/*   Updated: 2022/11/14 15:23:38 by samartin         ###   ########.fr       */
+/*   Created: 2022/11/14 12:06:37 by samartin          #+#    #+#             */
+/*   Updated: 2022/11/14 15:07:14 by samartin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "get_next_line.h"
+#include "get_next_line_bonus.h"
+
+static void	displace_buffer(char *buf, int pos)
+{
+	int	i;
+
+	i = 0;
+	if (buf[pos + i] == '\0')
+		buf[0] = '\0';
+	while (buf[pos + i] != '\0')
+	{
+		buf[i] = buf[pos + i];
+		i++;
+	}
+	buf[i] = '\0';
+}
 
 static char	*append_chnk(char **line, char *buf)
 {
@@ -31,7 +46,7 @@ static char	*append_chnk(char **line, char *buf)
 		return (NULL);
 	*line = (char *)gnl_mexpand(*line, line_len + i + 1);
 	*line = gnl_strncat(*line, buf, i);
-	buf += i;
+	displace_buffer(buf, i);
 	return (buf);
 }
 
@@ -52,42 +67,20 @@ static char	*clear_buffer(char *buf)
 	return (NULL);
 }
 
-static char	*fill_buffer(int fd, char *buf, char *buf_start)
+static char	*fill_buffer(int fd, char *buf)
 {
 	int	buff_len;
 
 	if (*buf == '\0')
 	{
-		buf = buf_start;
 		buff_len = read(fd, buf, BUFFER_SIZE);
 		if (buff_len < 1)
 		{
-			clear_buffer(buf_start);
-			return (NULL);
+			free (buf);
+			buf = NULL;
+			return (buf);
 		}
 		buf[buff_len] = '\0';
-	}
-	return (buf);
-}
-
-static char	*buffer_init(int fd, char *buf, char **buf_start)
-{
-	if (fd < 0 || fd > 511 || BUFFER_SIZE < 1 || read(fd, 0, 0) < 0)
-	{
-		if (fd >= 0 && fd <= 511)
-		{
-			buf = clear_buffer(*buf_start);
-			*buf_start = NULL;
-		}
-		return (NULL);
-	}
-	if (!buf)
-	{
-		buf = malloc((BUFFER_SIZE + 1) * (sizeof(char)));
-		if (!buf)
-			return (NULL);
-		*buf = '\0';
-		*buf_start = buf;
 	}
 	return (buf);
 }
@@ -95,19 +88,28 @@ static char	*buffer_init(int fd, char *buf, char **buf_start)
 char	*get_next_line(int fd)
 {
 	char		*line;
-	static char	*buf;
-	static char	*buf_start;
+	static char	*buf[512];
 
-	buf = buffer_init (fd, buf, &buf_start);
-	if (!buf)
+	if (fd < 0 || fd > 511 || BUFFER_SIZE < 1 || read(fd, 0, 0) < 0)
+	{
+		if (fd >= 0 && fd <= 511)
+			buf[fd] = clear_buffer(buf[fd]);
 		return (NULL);
+	}
+	if (!(buf[fd]))
+	{
+		buf[fd] = malloc((BUFFER_SIZE + 1) * (sizeof(char)));
+		if (!(buf[fd]))
+			return (NULL);
+		*(buf[fd]) = '\0';
+	}
 	line = NULL;
 	while (!line || (line[gnl_len(line) - 1] != '\n'))
 	{
-		buf = fill_buffer(fd, buf, buf_start);
-		if (!buf || *(buf) == '\0')
+		buf[fd] = fill_buffer(fd, buf[fd]);
+		if (!(buf[fd]) || *(buf[fd]) == '\0')
 			break ;
-		buf = append_chnk(&line, buf);
+		buf[fd] = append_chnk(&line, buf[fd]);
 	}
 	return (line);
 }
